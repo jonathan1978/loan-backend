@@ -2,10 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app import Customer, Agent
+import os
 
 DATABASE_USER = "Jonathan"
 DATABASE_PASSWORD = "Jonathan"
-DATABASE_URI = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:5432/loancompany"
+print("MY_HOME:", os.environ['DATABASE_URL'])
+DATABASE_URI = os.environ['DATABASE_URL'] + "?sslmode=require" or f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:5432/loancompany"
 engine = create_engine(DATABASE_URI)
 Base = declarative_base()
 Base.metadata.bind = engine

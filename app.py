@@ -5,7 +5,8 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, curren
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-import json 
+import json
+import os
 
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ app = Flask(__name__)
 # for external apps
 CORS(app)
 
-# Change it for a better security key 
+# Change it for a better security key
 # This is required for the login session
 app.config['SECRET_KEY'] = 'secret-key-goes-here'
 
@@ -31,7 +32,9 @@ DATABASE_USER = "Jonathan"   #Add your database username here
 DATABASE_PASSWORD = "Jonathan"   #Add your database password here
 DATABASE_PORT = 5432
 DATABASE_NAME="loancompany"
-DATABASE_URI = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}"
+print("MY_HOME:", os.environ['DATABASE_URL'])
+DATABASE_URI = os.environ['DATABASE_URL'] + "?sslmode=require" or f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:5432/loancompany"
+# DATABASE_URI = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db = SQLAlchemy(app)
@@ -70,11 +73,11 @@ class Customer(db.Model):
 
     def __repr__(self):
         return f'<id {self.id}>'
-    
+
     # to serialize its objects to json
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'name': self.name,
             'contact':self.contact,
             'loan_amount':self.loan_amount,
@@ -89,7 +92,7 @@ class Customer(db.Model):
 
 # Agent data
 class Agent(UserMixin, db.Model):
-    
+
     __tablename__ = 'agent'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -99,14 +102,14 @@ class Agent(UserMixin, db.Model):
     def __init__(self, email, password):
         self.email = email
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
-    
+
     def __repr__(self):
         return f'<id {self.id}>'
 
     #to serialized its objects to json
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'email': self.email,
             'password':self.password
         }
@@ -129,10 +132,10 @@ class Logout(Resource):
     def get(self):
         logout_user()
         return jsonify({"message":"Agent logged out"})
-        
+
 
 class CustomerList(Resource):
-    
+
     #decorator to check if agent is logged in to view data
     @login_required
     def get(self):
@@ -162,5 +165,3 @@ api.add_resource(CustomerDetails, '/customers/<customer_name>')
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
