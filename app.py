@@ -37,6 +37,9 @@ DATABASE_URI = os.environ['DATABASE_URL'] + "?sslmode=require" or f"postgresql:/
 # DATABASE_URI = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_PORT}/{DATABASE_NAME}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+PORT = os.environ['PORT']
+DEBUG = os.environ['Environment'] or None
+
 db = SQLAlchemy(app)
 
 api = Api(app)
@@ -164,4 +167,4 @@ api.add_resource(CustomerList, '/')
 api.add_resource(CustomerDetails, '/customers/<customer_name>')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=DEBUG,port=PORT)
