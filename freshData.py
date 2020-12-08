@@ -3,6 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app import Customer, Agent
 
+import os
+
 DATABASE_USER = "Jonathan"
 DATABASE_PASSWORD = "Jonathan"
 print("MY_HOME:", os.environ['DATABASE_URL'])
